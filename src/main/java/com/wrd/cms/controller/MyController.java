@@ -138,6 +138,7 @@ public class MyController {
 		article.setDeleted(0);//默认未删除
 		article.setHot(0);//默认非热门
 		article.setStatus(0);//默认待审核
+		article.setContentType(ContentType.HTML);//文章类型
 		//增加文章
 		return service.insert(article)>0;
 	}
@@ -194,7 +195,7 @@ public class MyController {
 		String json = gson.toJson(map);
 
 		article.setContent(json);// 把json数据存入内容字段
-		article.setContentType(ContentType.VOTE);
+		article.setContentType(ContentType.VOTE);//投票类型
 
 		// 文章初始数据
 		User user = (User) session.getAttribute("user");
@@ -204,7 +205,6 @@ public class MyController {
 		article.setDeleted(0);// 默认未删除
 		article.setHot(0);// 默认非热门
 		article.setStatus(1);// 默认已审核  ----  主要是测试 数据
-		article.setContentType(ContentType.HTML);//文章类型
 		
 		return service.insert(article) >0;
 

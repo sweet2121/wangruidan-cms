@@ -69,6 +69,7 @@
 	  <result column="created" property="created"/> 
 	  <result column="updated" property="updated"/> 
 	  <result column="summary" property="summary"/> 
+	  <result column="category_type" property="category_Type"/> 
 	  <!-- 封装一对一关系 -->
 	    <!-- 用户 -->
 	   <association property="user" javaType="User">
