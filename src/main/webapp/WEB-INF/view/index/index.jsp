@@ -151,6 +151,21 @@
 		</div>
 		<!-- 右边 -->
 		<div class="col-md-3">
+			<div class="card" style="width: 18rem;margin-top: 10px">
+	 				 <div class="card-header" style="text-align: center">本月评选排名</div>
+	    			  <div class="card-body">
+						<!--提示最新的10篇文章  -->
+						<c:forEach items="${lastArticles.list }" var="lastArticle">
+							<div class="media">
+			 				 	<img src="/pic/${lastArticle.picture }" style="width: 60px;height: 50px" class="mr-3 rounded" alt="...">
+			  						<div class="media-body">
+			    						<p style="font-size: 12px">${lastArticle.title }</p>
+			   					 	</div>
+							</div>
+							<hr/>
+						</c:forEach>
+					</div>
+				</div>
 			<div class="card" style="width: 18rem; margin-top: 6px">
 					<div class="card-header">问卷调查</div>
 					<div class="card-body">

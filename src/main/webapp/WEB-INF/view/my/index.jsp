@@ -88,6 +88,7 @@ a:visited {
 				<li class="list-group-item"><a href="#"><font color="tan">我的评论</font></a></li>
 				<li class="list-group-item"><a href="#"><font color="tan">个人信息</font></a></li>
 				<li class="list-group-item"><a href="#" data="/my/publishVote"><font color="tan" >发起投票</font></a></li>
+				<li class="list-group-item"><a href="#" data="/my/choose"><font color="tan">本月评选</font></a></li>
 			</ul>
 
 		</div>

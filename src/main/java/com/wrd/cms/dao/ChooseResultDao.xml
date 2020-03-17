@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wrd.cms.dao.ChooseResultDao">
+
+	<insert id="insert">
+
+		insert into
+		cms_choose_result(article_id,user_id,`option`) values (#{articleId},#{userId},#{option})
+
+	</insert>
+	
+	<select id="selects" resultType="ChooseResult">
+
+		select COUNT(`option`) as optionNum,`option`,(select count(id) from cms_choose_result
+		v2 where v2.article_id =v.article_id) as totalNum
+		from cms_choose_result v where
+		v.article_id =#{articleId} GROUP BY `option`
+
+	</select>
+	
+	<select id="select" resultType="ChooseResult">
+		<!-- select * from cms_choose_result where user_id =#{userId} and article_id =#{articleId}
+	 -->
+	 select c.*,a.title,u.username from cms_choose_result c join cms_article a on c.article_id=a.id join cms_user u on c.user_id=u.id
+	 
+	</select>
+</mapper>

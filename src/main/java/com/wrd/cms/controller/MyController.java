@@ -72,7 +72,13 @@ public class MyController {
 		
 		return service.select(id);
 	}
-	
+	@ResponseBody
+	@RequestMapping("chooseDetail")
+	public Article chooseDetail(Integer id){
+		
+		
+		return service.select(id);
+	}
 	/**
 	 * 
 	 * @Title: articles 
@@ -89,6 +95,18 @@ public class MyController {
 		
 		model.addAttribute("info", info);
 		return "my/articles";
+	}
+	
+	@RequestMapping("choose")
+	public String choose(Model model,HttpSession session,@RequestParam(defaultValue = "1")Integer page,@RequestParam(defaultValue = "5")Integer pageSize){
+		Article article=new Article();
+		User user = (User) session.getAttribute("user");
+		article.setUserId(user.getId());//只显示当前登录人的文章
+		PageInfo<Article> info=service.list(article, page, pageSize);
+		
+		model.addAttribute("info", info);
+		
+		return "my/choose";
 	}
 	
 	/**
@@ -183,6 +201,54 @@ public class MyController {
 	@ResponseBody
 	@PostMapping("publishVote")
 	public boolean publishVote(String[] options, Article article, HttpSession session) {
+		// LinkedHashMap 是有顺序的，
+		LinkedHashMap<Character, String> map = new LinkedHashMap<Character, String>();
+		char x = 'A';// 选项从 ABCD等依次排序进行
+		for (String option : options) {
+			map.put(x, option);
+			x = (char) (x + 1);
+		}
+		// 把map数据转为json
+		Gson gson = new Gson();
+		String json = gson.toJson(map);
+
+		article.setContent(json);// 把json数据存入内容字段
+		article.setContentType(ContentType.VOTE);//投票类型
+
+		// 文章初始数据
+		User user = (User) session.getAttribute("user");
+		article.setUserId(user.getId());// 发布人
+		article.setCreated(new Date());
+		article.setHits(0);// 点击量默认 0
+		article.setDeleted(0);// 默认未删除
+		article.setHot(0);// 默认非热门
+		article.setStatus(1);// 默认已审核  ----  主要是测试 数据
+		
+		return service.insert(article) >0;
+
+	}
+	/**
+	 * 
+	 * @Title: choose
+	 * @Description: 去发起投票choose
+	 * @return
+	 * @return: String
+	 */
+	@GetMapping("choose")
+	public String choose(){
+		
+		return "/my/choose";
+	}
+	/**
+	 * 
+	 * @Title: choose
+	 * @Description: 发起投票choose
+	 * @return
+	 * @return: boolean
+	 */
+	@ResponseBody
+	@PostMapping("choose")
+	public boolean choose(String[] options, Article article, HttpSession session) {
 		// LinkedHashMap 是有顺序的，
 		LinkedHashMap<Character, String> map = new LinkedHashMap<Character, String>();
 		char x = 'A';// 选项从 ABCD等依次排序进行

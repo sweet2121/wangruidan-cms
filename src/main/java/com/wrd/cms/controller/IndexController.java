@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.wrd.cms.domain.Article;
 import com.wrd.cms.domain.Category;
 import com.wrd.cms.domain.Channel;
+import com.wrd.cms.domain.ChooseResult;
 import com.wrd.cms.domain.Collect;
 import com.wrd.cms.domain.Comment;
 import com.wrd.cms.domain.ContentType;
@@ -29,6 +30,7 @@ import com.wrd.cms.domain.User;
 import com.wrd.cms.domain.Vote;
 import com.wrd.cms.service.ArticleService;
 import com.wrd.cms.service.ChannelService;
+import com.wrd.cms.service.ChooseResultService;
 import com.wrd.cms.service.CollectService;
 import com.wrd.cms.service.CommentService;
 import com.wrd.cms.service.SlideService;
@@ -56,6 +58,8 @@ public class IndexController {
 	private CollectService collectService;
 	@Resource
 	private VoteService voteService;
+	@Resource
+	private ChooseResultService chooseResultService;
 	
 	/**
 	 * 
@@ -96,7 +100,7 @@ public class IndexController {
 		Article article2=new Article();
 		article2.setStatus(1);//显示审核过的文章
 		article2.setDeleted(0);
-		PageInfo<Article> lastArticles = articleService.list(article2,1,10);
+		PageInfo<Article> lastArticles = articleService.list(article2,1,5);
 		model.addAttribute("lastArticles",lastArticles);
 		
 		//问卷调查
@@ -245,6 +249,54 @@ public class IndexController {
 			return false;
 	
 		return voteService.insert(vote) >0;
+	}
+	/**
+	 * 
+	 * @Title: voteDetail 
+	 * @Description: 去投票
+	 * @param session
+	 * @param id
+	 * @param model
+	 * @return
+	 * @return: String
+	 */
+	@RequestMapping("chooseDetail")
+	public String chooseDetail(HttpSession session,Integer id,Model model){
+		Article article = articleService.select(id);
+		String content = article.getContent();
+		Gson gson =new Gson();
+		LinkedHashMap<Character,String> mapChoose = gson.fromJson(content, LinkedHashMap.class);
+	
+		
+		model.addAttribute("mapChoose", mapChoose);
+		model.addAttribute("article", article);
+		
+		//查询投票情况
+		List<ChooseResult> choose = chooseResultService.selects(article.getId());
+		for (ChooseResult vote : choose) {
+			//获取选项的值并重新封装到vote
+			vote.setOption(mapChoose.get(vote.getOption()));
+			//======计算百分比
+			vote.setPercent(new BigDecimal(NumberUtil.getPercent(vote.getOptionNum(),vote.getTotalNum())));
+		}
+		model.addAttribute("choose", choose);
+		
+		return "index/chooseDetail";
+	}
+	
+	//投票
+	@ResponseBody
+	@PostMapping("addChoose")
+	public boolean addVote(ChooseResult chooseResult ,HttpSession session) {
+		User user = (User) session.getAttribute("user");
+		if(null ==user)
+		return false;//没有登录的用户不能收藏
+		chooseResult.setUserId(user.getId());
+		//检查用户是否已经投过票
+		if(chooseResultService.select(chooseResult)!=null)
+			return false;
+	
+		return chooseResultService.insert(chooseResult) >0;
 	}
 }
 
